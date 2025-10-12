@@ -118,14 +118,14 @@ signal.signal(signal.SIGTERM, handle_exit)
 
 # -------------------- Interactive Setup --------------------
 
-print("         _          __  __             
+print("""         _          __  __             
      /\        | |        |  \/  |            
     /  \  _   _| |_ ___   | \  / | __ _  ___  
    / /\ \| | | | __/ _ \  | |\/| |/ _` |/ __| 
   / ____ \ |_| | || (_) | | |  | | (_| | (__  
  /_/    \_\__,_|\__\___/  |_|  |_|\__,_|\___| 
                                      -by crus       
-                                              \n")
+                                              \n""")
 
 iface = input("Interface name (e.g., wlan0, eth0): ").strip()
 interval = float(input("Change interval in seconds (e.g., 60): ").strip() or "60")
