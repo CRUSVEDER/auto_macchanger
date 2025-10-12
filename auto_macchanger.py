@@ -125,7 +125,7 @@ print("""         _          __  __
   / ____ \ |_| | || (_) | | |  | | (_| | (__  
  /_/    \_\__,_|\__\___/  |_|  |_|\__,_|\___| 
                                      -by crus       
-                                              \n""")
+                                              """)
 
 iface = input("Interface name (e.g., wlan0, eth0): ").strip()
 interval = float(input("Change interval in seconds (e.g., 60): ").strip() or "60")
