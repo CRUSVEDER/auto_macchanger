@@ -80,7 +80,7 @@ Next change in 120s...
 ## Options (Prompts Explained)
 
 Prompt	Description
-``
+```
 Interface name	Your network device (e.g., eth0, wlan0)
 Change interval	How many seconds between each MAC change
 Count	Number of times to change (0 = infinite)
