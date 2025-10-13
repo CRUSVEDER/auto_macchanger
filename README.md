@@ -131,11 +131,11 @@ If restore on exit is enabled, your original MAC address will automatically be r
 ## Logging Example
 
 When you specify a log file (e.g., mac_log.txt), all actions are stored like:
-
+```
 [2025-10-12 19:01:42] Original MAC: 84:7a:88:de:45:32
 [2025-10-12 19:01:42] [1] Generated random MAC: 02:12:34:56:78:9a
 [2025-10-12 19:03:42] MAC successfully changed to 02:12:34:56:78:9a
-
+```
 
 ---
 
