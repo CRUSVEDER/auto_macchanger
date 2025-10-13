@@ -56,14 +56,14 @@ When you run the script, it will guide you interactively:
 
 ==========  Auto MAC Changer ==========
 
-Interface name (e.g., wlan0, eth0): wlan0
-Change interval in seconds (e.g., 60): 120
-How many times to change? (0 = infinite): 5
-OUI/prefix (optional, e.g., 02:11:22):
-Dry-run mode? (y/n): n
-Restore original MAC on exit? (y/n): y
-Show countdown timer? (y/n): y
-Log file path (optional, e.g., mac_log.txt): maclog.txt
+-Interface name (e.g., wlan0, eth0): wlan0
+-Change interval in seconds (e.g., 60): 120
+-How many times to change? (0 = infinite): 5
+-OUI/prefix (optional, e.g., 02:11:22):
+-Dry-run mode? (y/n): n
+-Restore original MAC on exit? (y/n): y
+-Show countdown timer? (y/n): y
+-Log file path (optional, e.g., mac_log.txt): maclog.txt
 
 Example Output:
 
