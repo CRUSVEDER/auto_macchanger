@@ -150,7 +150,7 @@ Use responsibly within your own network or in authorized pentesting environments
 ## Author
 
 Crusveder 
-CybersecurityEnthusiast
+Cybersecurity Enthusiast
 GitHub Profile: https://github.com/CRUSVEDER
 
 ---
