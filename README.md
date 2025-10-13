@@ -150,9 +150,8 @@ Use responsibly within your own network or in authorized pentesting environments
 ## Author
 
 Crusveder 
-Cybersecurity & Forensics Enthusiast
-GitHub Profile
-https://github.com/CRUSVEDER
+CybersecurityEnthusiast
+GitHub Profile: https://github.com/CRUSVEDER
 
 ---
 
