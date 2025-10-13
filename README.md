@@ -81,14 +81,14 @@ Next change in 120s...
 
 Prompt	Description
 ```
-Interface name	Your network device (e.g., eth0, wlan0)
-Change interval	How many seconds between each MAC change
-Count	Number of times to change (0 = infinite)
-OUI/prefix	Optional vendor-like prefix (e.g., 02:11:22)
-Dry-run mode	Only shows commands without executing them
-Restore on exit	Restores your original MAC when you quit
-Show countdown	Displays timer until next change
-Log file path	Saves all actions into a log file
+Interface name:	Your network device (e.g., eth0, wlan0)
+Change interval:	How many seconds between each MAC change
+Count:	Number of times to change (0 = infinite)
+OUI/prefix:	Optional vendor-like prefix (e.g., 02:11:22)
+Dry-run mode:	Only shows commands without executing them
+Restore on exit:	Restores your original MAC when you quit
+Show countdown:	Displays timer until next change
+Log file path:	Saves all actions into a log file
 ```
 
 
