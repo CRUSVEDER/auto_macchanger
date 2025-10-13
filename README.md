@@ -55,7 +55,7 @@ sudo ./auto_macchanger.py
 When you run the script, it will guide you interactively:
 
 ==========  Auto MAC Changer ==========
-
+```
 -Interface name (e.g., wlan0, eth0): wlan0
 -Change interval in seconds (e.g., 60): 120
 -How many times to change? (0 = infinite): 5
@@ -64,15 +64,16 @@ When you run the script, it will guide you interactively:
 -Restore original MAC on exit? (y/n): y
 -Show countdown timer? (y/n): y
 -Log file path (optional, e.g., mac_log.txt): maclog.txt
+```
 
 Example Output:
-
+```
 [2025-10-12 18:41:23] Original MAC: 74:d4:35:xx:xx:xx
 [2025-10-12 18:41:23] [1] Generated random MAC: 02:12:34:ab:cd:ef
 [2025-10-12 18:41:23] Setting MAC: 02:12:34:ab:cd:ef
 [2025-10-12 18:41:23] MAC successfully changed to 02:12:34:ab:cd:ef
 Next change in 120s...
-
+```
 
 ---
 
