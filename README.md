@@ -38,12 +38,12 @@ It allows you to **automatically randomize** your network interface's MAC addres
 
 2. Make the script executable:
 
-chmod +x auto_macchanger.py
+`chmod +x auto_macchanger.py`
 
 
 3. Run the script with sudo (required to change MAC addresses):
 
-sudo ./auto_macchanger.py
+`sudo ./auto_macchanger.py`
 
 
 
