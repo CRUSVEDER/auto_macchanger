@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+
 #An advanced and interactive MAC address rotation tool
 #by github.com/CRUSVEDER
-#!/usr/bin/env python3
+
 import subprocess
 import random
 import re
