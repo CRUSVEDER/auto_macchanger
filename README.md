@@ -44,7 +44,7 @@ chmod +x auto_macchanger.py
 3. Run the script with sudo (required to change MAC addresses):
 
 sudo ./auto_macchanger.py
-
+```
 
 
 
