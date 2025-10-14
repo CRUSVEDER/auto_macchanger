@@ -46,8 +46,6 @@ It allows you to **automatically randomize** your network interface's MAC addres
    sudo ./auto_macchanger.py
 
 
-
-
 ---
 
 ## Usage
@@ -114,7 +112,6 @@ Prefix: 02:11:22
 
 Dry-run mode: yes
 
-
 ---
 
 ## Safe Exit
@@ -124,7 +121,6 @@ You can stop the tool anytime with:
 Ctrl + C
 
 If restore on exit is enabled, your original MAC address will automatically be restored.
-
 
 ---
 
@@ -144,7 +140,6 @@ When you specify a log file (e.g., mac_log.txt), all actions are stored like:
 This tool is provided for educational and privacy-testing purposes only.
 Do not use it to interfere with or impersonate network devices you don’t own or control.
 Use responsibly within your own network or in authorized pentesting environments.
-
 
 ---
 
