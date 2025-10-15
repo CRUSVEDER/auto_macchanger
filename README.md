@@ -33,7 +33,7 @@ It allows you to **automatically randomize** your network interface's MAC addres
 
 1. Clone or download this repository:
    ```bash
-   git clone https://github.com/<your-username>/auto_macchanger.git
+   git clone https://github.com/CRUSVEDER/auto_macchanger.git
    cd auto_macchanger
 
 2. Make the script executable:
