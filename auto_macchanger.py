@@ -86,7 +86,7 @@ def prompt(msg):
 
 def require_root():
     if os.geteuid() != 0:
-        print(f"{RED}[-] Run as root{RESET}")
+        print(f"{RED}[!] Run as root{RESET}")
         sys.exit(1)
 
 def iface_exists(iface):
@@ -97,7 +97,7 @@ def detect_tool():
         return "ip"
     if shutil.which("ifconfig"):
         return "ifconfig"
-    sys.exit("[-] ip/ifconfig not found")
+    sys.exit("[!] ip/ifconfig not found")
 
 def run(cmd, dry=False):
     if dry:
@@ -251,33 +251,27 @@ def safe_exit(*_):
 signal.signal(signal.SIGINT, safe_exit)
 signal.signal(signal.SIGTERM, safe_exit)
 
+
 # ============================================================
 # MAIN
 # ============================================================
-
 def main():
     global changer, restore_on_exit
-
     require_root()
     banner()
-
-    iface = prompt("Interface:")
+    iface = prompt("Interface name [e.g., wlan0, eth0]:")
     if not iface_exists(iface):
-        sys.exit("[-] Interface not found")
-
-    interval = int(prompt("Interval seconds [60]:") or 60)
-    count = int(prompt("Change count (0=∞):") or 0)
-
-    dry = prompt("Dry-run? (y/n):").lower() == "y"
-    restore_on_exit = prompt("Restore on exit? (y/n):").lower() == "y"
-    logf = prompt("Log file (optional):") or None
-
+        sys.exit("[!] Interface not found")
+    interval = int(prompt("Change interval in seconds [e.g., 60]:") or 60)
+    count = int(prompt("How many times to change? [0 = infinite]:") or 0)
+    dry = prompt("Dry-run mode? [y/n]:").lower() == "y"
+    restore_on_exit = prompt("Restore original MAC on exit? [y/n]:").lower() == "y"
+    logf = prompt("Log file path [optional, e.g., mac_log.txt]:") or None
+    show_countdown = prompt("Show countdown timer? [y/n]:").lower() == "y"
     vendor = persistent_vendor(iface)
     tool = detect_tool()
-
     changer = MACIdentityChanger(iface, tool, dry, logf)
     changer.log(f"Vendor profile → {vendor}")
-
     i = 0
     try:
         while True:
@@ -288,9 +282,15 @@ def main():
             changer.log(f"[{i}] MAC → {mac}")
             changer.set_mac(mac)
             apply_fingerprint(vendor, dry)
-            time.sleep(interval)
+            if show_countdown:
+                for remaining in range(interval, 0, -1):
+                    sys.stdout.write(f"\rNext change in {remaining}s...   ")
+                    sys.stdout.flush()
+                    time.sleep(1)
+                print()  # New line after countdown
+            else:
+                time.sleep(interval)
     finally:
         safe_exit()
-
 if __name__ == "__main__":
     main()
