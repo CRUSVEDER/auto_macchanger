@@ -47,18 +47,18 @@ Automatically randomizes your network interface's MAC address with **vendor prof
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/CRUSVEDER/auto_mac.git
-   cd auto_mac
+   git clone https://github.com/CRUSVEDER/auto_macchanger.git
+   cd auto_macchanger
    ```
 
 2. **Make the script executable:**
    ```bash
-   chmod +x auto_mac.py
+   chmod +x auto_macchanger.py
    ```
 
 3. **Run with sudo:**
    ```bash
-   sudo ./auto_mac.py
+   sudo ./auto_macchanger.py
    ```
 
 ---
