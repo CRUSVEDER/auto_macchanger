@@ -1,159 +1,365 @@
-#  Auto MAC Changer
+# Auto MAC Identity Engine
 
-An **advanced and interactive MAC address rotation tool** built in Python.  
-It allows you to **automatically randomize** your network interface's MAC address at fixed time intervals — with options for restoring the original MAC, logging activity, and using vendor-style prefixes (OUI).
-
----
-
-##  Features
-
-- Interactive CLI (asks step-by-step inputs — no command-line flags needed)  
-- Random MAC address generation at user-specified intervals  
-- Option to restore your original MAC on exit  
-- Countdown display between rotations  
-- Supports **`ip`** and **`ifconfig`** (Linux/macOS)  
-- Optional **log file** to record all MAC changes  
-- Safe exit with cleanup (Ctrl + C supported)  
-- Works for both Ethernet (`eth0`) and Wireless (`wlan0`) interfaces  
-- Dry-run mode to simulate commands without making changes  
+An **advanced and intelligent MAC address identity rotation tool** built in Python.  
+Automatically randomizes your network interface's MAC address with **vendor profiling**, **believability scoring**, **IP tracking**, and **persistent network identity management**.
 
 ---
 
-##  Requirements
+## Features
 
-- Python **3.6+**
-- Root or sudo privileges  
-- Either of the following installed on your system:
-  - `ip` (recommended)  
-  - or `ifconfig`  
+### Core Functionality
+- **Interactive CLI** - Step-by-step guided setup (no command-line flags needed)
+- **Smart MAC Rotation** - Automatic MAC address changes at fixed intervals
+- **Vendor Profiling** - Choose from 7 vendor profiles (Apple, Intel, Samsung, Realtek, Raspberry Pi, VMware, VirtualBox)
+- **Identity Fingerprinting** - Automatically sets matching hostname and TTL values
+- **Believability Scoring** - Real-time scoring system (0-100) to evaluate identity realism
+- **IP Address Tracking** - Logs IP addresses after each MAC change
+- **Network Persistence** - Remembers vendor profiles per SSID for consistent identity
+
+### Advanced Options
+- **Auto-Select Mode** - Intelligently chooses vendor based on interface type and network
+- **Fully Random Mode** - Generate completely random MAC addresses
+- **Custom OUI** - Use your own vendor prefix (e.g., `00:11:22`)
+- **Countdown Timer** - Visual timer showing seconds until next change
+- **Activity Logging** - Save all changes, IPs, and scores to a log file
+- **Dry-Run Mode** - Test without making actual changes
+- **Safe Exit** - Automatically restores original MAC on exit (Ctrl+C supported)
+
+### Compatibility
+- Supports both `ip` and `ifconfig` tools
+- Works on Ethernet (`eth0`, `en0`) and Wireless (`wlan0`, `wlp3s0`) interfaces
+- Linux and macOS compatible
 
 ---
 
-##  Installation
+## Requirements
 
-1. Clone or download this repository:
+- **Python 3.6+**
+- **Root/sudo privileges**
+- One of the following installed:
+  - `ip` (recommended, iproute2 package)
+  - `ifconfig` (net-tools package)
+- Optional: `iwgetid` for WiFi SSID detection
+
+---
+
+## Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/CRUSVEDER/auto_macchanger.git
-   cd auto_macchanger
+   git clone https://github.com/CRUSVEDER/auto_mac.git
+   cd auto_mac
+   ```
 
-2. Make the script executable:
+2. **Make the script executable:**
    ```bash
-   chmod +x auto_macchanger.py
+   chmod +x auto_mac.py
+   ```
 
-
-4. Run the script with sudo (required to change MAC addresses):
+3. **Run with sudo:**
    ```bash
-   sudo ./auto_macchanger.py
-
+   sudo ./auto_mac.py
+   ```
 
 ---
 
 ## Usage
 
-When you run the script, it will guide you interactively:
+### Interactive Setup
 
-==========  Auto MAC Changer ==========
+When you run the script, it will guide you through setup:
+
 ```
--Interface name (e.g., wlan0, eth0): wlan0
--Change interval in seconds (e.g., 60): 120
--How many times to change? (0 = infinite): 5
--OUI/prefix (optional, e.g., 02:11:22):
--Dry-run mode? (y/n): n
--Restore original MAC on exit? (y/n): y
--Show countdown timer? (y/n): y
--Log file path (optional, e.g., mac_log.txt): maclog.txt
+ █████╗ ██╗   ██╗████████╗ ██████╗     ███╗   ███╗ █████╗  ██████╗
+██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗    ████╗ ████║██╔══██╗██╔════╝
+███████║██║   ██║   ██║   ██║   ██║    ██╔████╔██║███████║██║     
+██╔══██║██║   ██║   ██║   ██║   ██║    ██║╚██╔╝██║██╔══██║██║     
+██║  ██║╚██████╔╝   ██║   ╚██████╔╝    ██║ ╚═╝ ██║██║  ██║╚██████╗
+╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝     ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝
+        AUTO MAC IDENTITY ENGINE — CRUSVEDER
+
+Interface name [e.g., wlan0, eth0]: eth0
+Change interval in seconds [e.g., 60]: 60
+How many times to change? [0 = infinite]: 0
+Dry-run mode? [y/n]: n
+Restore original MAC on exit? [y/n]: y
+Log file path [optional, e.g., mac_log.txt]: mac_changes.log
+Show countdown timer? [y/n]: y
+
+MAC Vendor Mode:
+1) Auto (interface + network based) [Recommended]
+2) Manual vendor selection
+3) Custom OUI
+4) Fully random
+Select option [1-4]: 1
 ```
 
-Example Output:
+### Example Output
+
 ```
-[2025-10-12 18:41:23] Original MAC: 74:d4:35:xx:xx:xx
-[2025-10-12 18:41:23] [1] Generated random MAC: 02:12:34:ab:cd:ef
-[2025-10-12 18:41:23] Setting MAC: 02:12:34:ab:cd:ef
-[2025-10-12 18:41:23] MAC successfully changed to 02:12:34:ab:cd:ef
-Next change in 120s...
+[2026-02-04 14:47:22] Vendor profile → realtek
+[2026-02-04 14:47:22] [1] MAC → 52:54:00:24:26:67
+[2026-02-04 14:47:25] [1] IP  → 192.168.0.131
+[2026-02-04 14:47:25] Believability score → 75/100
+Next change in 60s...
 ```
 
 ---
 
-## Options (Prompts Explained)
+## Vendor Modes Explained
 
-Prompt	Description
-```
-Interface name:	Your network device (e.g., eth0, wlan0)
-Change interval:	How many seconds between each MAC change
-Count:	Number of times to change (0 = infinite)
-OUI/prefix:	Optional vendor-like prefix (e.g., 02:11:22)
-Dry-run mode:	Only shows commands without executing them
-Restore on exit:	Restores your original MAC when you quit
-Show countdown:	Displays timer until next change
-Log file path:	Saves all actions into a log file
-```
+### 1. Auto Mode (Recommended)
+Intelligently selects vendor based on:
+- Interface type (wlan → Apple/Samsung, eth → Intel/Realtek)
+- Current WiFi network (SSID)
+- Saves vendor preference per network for consistency
 
+**Best for:** Maintaining persistent identity across reconnections
 
----
+### 2. Manual Vendor Selection
+Choose from available vendors:
+- **Apple** - MacBook Pro/Air profiles
+- **Intel** - ThinkPad/Dell laptop profiles
+- **Samsung** - Galaxy device profiles
+- **Realtek** - Common network adapters
+- **Raspberry Pi** - IoT device profiles
+- **VMware** - Virtual machine profiles
+- **VirtualBox** - Virtual machine profiles
 
-## Example Scenarios
+**Best for:** Impersonating specific device types
 
-1. Random MAC every 60s indefinitely:
+### 3. Custom OUI
+Enter your own vendor prefix (e.g., `00:11:22`)
 
-Interface: wlan0
-Interval: 60
-Count: 0
-Restore: yes
+**Best for:** Advanced users with specific OUI requirements
 
-2. 5 rotations every 30s with vendor prefix:
+### 4. Fully Random
+Generates completely random MAC addresses
 
-Interface: eth0
-Interval: 30
-Count: 5
-Prefix: 02:11:22
-
-3. Dry-run (test without applying changes):
-
-Dry-run mode: yes
+**Best for:** Maximum anonymity (lower believability scores)
 
 ---
 
-## Safe Exit
+## Believability Score Explained
 
-You can stop the tool anytime with:
+AUTO MAC evaluates how realistic the identity looks:
 
-Ctrl + C
+| Check | Points |
+|-------|--------|
+| Vendor matches interface type | 20 |
+| Valid vendor OUI | 20 |
+| TTL matches vendor profile | 15 |
+| Hostname matches vendor style | 15 |
+| Persistent network identity | 10 |
+| MAC quality (not sequential/broadcast) | 10 |
+| IP acquisition success | 10 |
+| **Total** | **100** |
 
-If restore on exit is enabled, your original MAC address will automatically be restored.
+**Score Ranges:**
+- **85-95** - Perfect identity (vendor mode with persistence)
+- **70-85** - Good identity (vendor mode)
+- **55-70** - Decent identity (random mode or partial match)
+- **30-55** - Weak identity (poor configuration)
+
+---
+
+## Configuration Options
+
+| Prompt | Description | Example |
+|--------|-------------|---------|
+| **Interface name** | Your network device | `eth0`, `wlan0`, `en0` |
+| **Change interval** | Seconds between MAC changes | `60`, `300`, `3600` |
+| **Count** | Number of rotations (0 = infinite) | `0`, `5`, `10` |
+| **Dry-run mode** | Test without applying changes | `y` or `n` |
+| **Restore on exit** | Restore original MAC when quitting | `y` or `n` |
+| **Log file path** | Save activity to file | `mac_log.txt` or empty |
+| **Show countdown** | Display timer between changes | `y` or `n` |
+| **Vendor mode** | Identity selection method | `1-4` |
 
 ---
 
 ## Logging Example
 
-When you specify a log file (e.g., mac_log.txt), all actions are stored like:
+When you specify a log file, all activity is recorded:
+
 ```
-[2025-10-12 19:01:42] Original MAC: 84:7a:88:de:45:32
-[2025-10-12 19:01:42] [1] Generated random MAC: 02:12:34:56:78:9a
-[2025-10-12 19:03:42] MAC successfully changed to 02:12:34:56:78:9a
+[2026-02-04 14:47:22] Vendor profile → realtek
+[2026-02-04 14:47:22] [1] MAC → 52:54:00:24:26:67
+[2026-02-04 14:47:25] [1] IP  → 192.168.0.131
+[2026-02-04 14:47:25] Believability score → 75/100
+[2026-02-04 14:48:22] [2] MAC → 00:e0:4c:64:b6:78
+[2026-02-04 14:48:25] [2] IP  → 192.168.0.152
+[2026-02-04 14:48:25] Believability score → 75/100
+[2026-02-04 14:49:15] Restoring MAC → 00:e0:4c:0b:e9:67
 ```
+
+---
+
+## Example Scenarios
+
+### Scenario 1: Stealth Browsing (Auto Mode)
+```
+Interface: wlan0
+Interval: 300 (5 minutes)
+Count: 0 (infinite)
+Vendor Mode: 1 (Auto)
+Restore: yes
+Score: 80-90/100
+```
+**Use case:** Browse anonymously with consistent identity per network
+
+### Scenario 2: Penetration Testing (Manual Vendor)
+```
+Interface: eth0
+Interval: 60
+Count: 10
+Vendor Mode: 2 (Manual → Intel)
+Restore: yes
+Log: pentest_session.log
+Score: 70-85/100
+```
+**Use case:** Test network access controls with different device types
+
+### Scenario 3: Maximum Anonymity (Random Mode)
+```
+Interface: wlan0
+Interval: 120
+Count: 0
+Vendor Mode: 4 (Fully random)
+Restore: yes
+Score: 55-70/100
+```
+**Use case:** Maximum MAC randomization (trade-off: lower believability)
+
+### Scenario 4: Custom OUI Testing
+```
+Interface: eth0
+Interval: 180
+Count: 5
+Vendor Mode: 3 (Custom OUI: 00:11:22)
+Restore: yes
+Score: Varies
+```
+**Use case:** Test with specific vendor prefix
+
+---
+
+## Safe Exit
+
+Stop the tool anytime with **Ctrl+C**
+
+If **restore on exit** is enabled, your original MAC will automatically be restored:
+```
+^C
+[!] Exiting safely
+[2026-02-04 15:30:45] Restoring MAC → 00:e0:4c:0b:e9:67
+```
+
+---
+
+## Persistent Network Profiles
+
+The tool saves vendor preferences per WiFi network in:
+```
+/var/lib/mac_identity_profiles.json
+```
+
+Example:
+```json
+{
+  "HomeWiFi": "apple",
+  "OfficeNetwork": "intel",
+  "CafeGuest": "samsung"
+}
+```
+
+This ensures **consistent identity** when reconnecting to known networks.
+
+---
+
+## Technical Details
+
+### MAC Address Format
+- First 3 octets: OUI (vendor prefix)
+- Last 3 octets: Random
+- Locally administered bit set (bit 1 of first byte)
+- Unicast address (bit 0 of first byte = 0)
+
+### Fingerprint Spoofing
+The tool modifies system fingerprints to match vendor profiles:
+- **Hostname**: Changed to match vendor style (e.g., `MacBook-Pro`, `ThinkPad`)
+- **TTL**: Adjusted to match vendor profile (64 for most, 128 for VMs)
+
+### Supported Interfaces
+- **Wireless**: `wlan0`, `wlan1`, `wlp3s0`, `wlp2s0b1`
+- **Ethernet**: `eth0`, `eth1`, `en0`, `enp3s0`
+- **Virtual**: `vmnet0`, `vboxnet0`
 
 ---
 
 ## Disclaimer
 
-This tool is provided for educational and privacy-testing purposes only.
-Do not use it to interfere with or impersonate network devices you don’t own or control.
-Use responsibly within your own network or in authorized pentesting environments.
+This tool is provided for **educational and privacy-testing purposes only**.
+
+- Use in your own network or authorized testing environments
+- Test network security and privacy configurations
+- Learn about MAC address spoofing and network identity
+- Do NOT use to interfere with networks you don't own
+- Do NOT use to impersonate other devices maliciously
+- Do NOT use for illegal activities
+
+**Use responsibly and ethically.**
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+Areas for improvement:
+- Additional vendor profiles
+- More sophisticated scoring algorithms
+- IPv6 support
+- GUI interface
+- Network traffic analysis integration
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
 ## Author
 
-**Crusveder** 
-
-GitHub Profile: https://github.com/CRUSVEDER
+**CRUSVEDER**  
+GitHub: [@CRUSVEDER](https://github.com/CRUSVEDER)
 
 ---
 
-## Example command to start directly
+## Quick Start Command
 
+```bash
 sudo python3 auto_macchanger.py
+```
 
- Stay private, stay rotating!
+---
 
+
+## Support
+
+If you encounter any issues or have questions:
+1. Check the [Issues](https://github.com/CRUSVEDER/auto_macchanger/issues) page
+2. Create a new issue with detailed information
+3. Include your OS, Python version, and error messages
+
+---
+
+## Star History
+
+If you find this tool useful, please consider giving it a star on GitHub!
+
+---
+
+**Stay private, stay rotating!**
