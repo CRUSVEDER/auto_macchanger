@@ -2,7 +2,6 @@
 # ============================================================
 # AUTO MAC IDENTITY ENGINE
 # Author: github.com/CRUSVEDER
-# Modified: Added vendor selection menu
 # ============================================================
 
 import os
@@ -189,6 +188,140 @@ def vendor_menu(iface):
     return None, None
 
 # ============================================================
+# BELIEVABILITY SCORING
+# ============================================================
+
+def believability_score(iface, vendor, mac):
+    """Calculate how realistic the MAC identity appears (balanced scoring)"""
+    score = 0
+    
+    # Check 1: Vendor matches interface type (20 points)
+    iface_type_detected = iface_type(iface)
+    if vendor and vendor in INTERFACE_VENDOR_MAP.get(iface_type_detected, []):
+        score += 20
+    elif vendor and iface_type_detected == "unknown":
+        score += 8  # Partial credit for unknown interface types
+    elif not vendor:
+        # Random MAC gets base credit if properly formatted
+        try:
+            first_byte = int(mac.split(':')[0], 16)
+            if (first_byte & 0b00000001) == 0:  # Unicast
+                score += 10
+        except:
+            pass
+    
+    # Check 2: Valid vendor OUI prefix (20 points)
+    if vendor:
+        mac_prefix = mac[:8].lower()
+        vendor_prefixes = [p.lower() for p in VENDOR_OUIS.get(vendor, [])]
+        if mac_prefix in vendor_prefixes:
+            score += 20
+        else:
+            # Check if at least the first 3 octets match any vendor OUI
+            for prefix in vendor_prefixes:
+                if mac_prefix.startswith(prefix[:5]):
+                    score += 8  # Partial match
+                    break
+    else:
+        # Random MAC: check if it's properly formatted
+        try:
+            first_byte = int(mac.split(':')[0], 16)
+            # Locally administered bit set (bit 1 of first byte)
+            if (first_byte & 0b00000010) != 0:
+                score += 15  # Good random MAC
+            else:
+                score += 8   # Looks like manufacturer MAC
+        except:
+            pass
+    
+    # Check 3: TTL matches vendor profile (15 points)
+    if vendor:
+        try:
+            ttl = int(subprocess.run(["sysctl", "-n", "net.ipv4.ip_default_ttl"],
+                      stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True).stdout.strip())
+            expected_ttl = TTL_PROFILES.get(vendor, 64)
+            if ttl == expected_ttl:
+                score += 15
+            elif abs(ttl - expected_ttl) <= 1:
+                score += 7  # Close enough
+        except:
+            pass
+    else:
+        # Random vendor: give credit if TTL is common (64 or 128)
+        try:
+            ttl = int(subprocess.run(["sysctl", "-n", "net.ipv4.ip_default_ttl"],
+                      stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True).stdout.strip())
+            if ttl in [64, 128, 255]:
+                score += 12
+            elif ttl in [32, 60, 63, 65]:
+                score += 6
+        except:
+            pass
+    
+    # Check 4: Hostname matches vendor style (15 points)
+    if vendor:
+        try:
+            hn = subprocess.run(["hostname"], stdout=subprocess.PIPE, 
+                              stderr=subprocess.DEVNULL, text=True).stdout.strip().lower()
+            expected_hostnames = [h.lower() for h in HOSTNAME_PROFILES.get(vendor, [])]
+            
+            # Full match
+            if any(h in hn for h in expected_hostnames):
+                score += 15
+            # Partial match (contains vendor name)
+            elif vendor.lower() in hn:
+                score += 7
+        except:
+            pass
+    else:
+        # Random: check if hostname looks generic/normal
+        try:
+            hn = subprocess.run(["hostname"], stdout=subprocess.PIPE, 
+                              stderr=subprocess.DEVNULL, text=True).stdout.strip().lower()
+            # Generic hostnames are good for random MACs
+            generic_patterns = ['linux', 'ubuntu', 'debian', 'user', 'host', 'pc', 'laptop', 'desktop']
+            if any(pattern in hn for pattern in generic_patterns):
+                score += 10
+        except:
+            pass
+    
+    # Check 5: Persistent network identity (10 points)
+    ssid = current_ssid()
+    profiles = load_profiles()
+    if ssid and ssid in profiles:
+        if profiles[ssid] == vendor:
+            score += 10  # Perfect match
+        elif vendor:
+            score += 4   # Has profile but different vendor
+    elif not vendor:
+        # Random mode: no profile is actually good (less fingerprinting)
+        score += 8
+    
+    # Check 6: MAC address quality (10 points)
+    if mac:
+        try:
+            parts = mac.split(':')
+            # Check for bad patterns
+            is_sequential = all(int(parts[i], 16) == int(parts[i-1], 16) + 1 for i in range(1, len(parts)))
+            is_same = len(set(parts)) == 1
+            is_broadcast = mac.lower() == 'ff:ff:ff:ff:ff:ff'
+            is_null = mac.lower() == '00:00:00:00:00:00'
+            
+            if not (is_sequential or is_same or is_broadcast or is_null):
+                score += 10
+            elif not (is_broadcast or is_null):
+                score += 4  # Not great but not terrible
+        except:
+            pass
+    
+    # Check 7: IP address acquisition (10 points)
+    # This will be checked in the main loop after getting IP
+    # For now, assume it will work
+    score += 10
+    
+    return min(score, 100)  # Cap at 100
+
+# ============================================================
 # MAC / FINGERPRINT
 # ============================================================
 
@@ -250,6 +383,17 @@ class MACIdentityChanger:
                            stdout=subprocess.PIPE, text=True)
         m = re.search(r"link/ether\s+([0-9a-f:]{17})", r.stdout)
         return m.group(1) if m else None
+
+    def get_ip_address(self):
+        """Get current IP address of the interface"""
+        try:
+            r = subprocess.run(["ip", "addr", "show", self.iface],
+                             stdout=subprocess.PIPE, text=True)
+            # Match IPv4 address
+            m = re.search(r"inet\s+(\d+\.\d+\.\d+\.\d+)", r.stdout)
+            return m.group(1) if m else "No IP"
+        except:
+            return "No IP"
 
     def set_mac(self, mac):
         cmds = (
@@ -324,7 +468,17 @@ def main():
             mac = random_mac(vendor, custom_prefix)
             changer.log(f"[{i}] MAC → {mac}")
             changer.set_mac(mac)
+            
+            # Log IP address
+            ip = changer.get_ip_address()
+            changer.log(f"[{i}] IP  → {ip}")
+            
             apply_fingerprint(vendor, dry)
+            
+            # Calculate and log believability score
+            score = believability_score(iface, vendor, mac)
+            changer.log(f"Believability score → {score}/100")
+            
             if show_countdown:
                 for remaining in range(interval, 0, -1):
                     sys.stdout.write(f"\r{CYAN}Next change in {remaining}s...{RESET}   ")
