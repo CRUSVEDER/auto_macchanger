@@ -2,6 +2,7 @@
 # ============================================================
 # AUTO MAC IDENTITY ENGINE
 # Author: github.com/CRUSVEDER
+# Modified: Added vendor selection menu
 # ============================================================
 
 import os
@@ -153,6 +154,41 @@ def persistent_vendor(iface):
     return vendor
 
 # ============================================================
+# VENDOR SELECTION
+# ============================================================
+
+def vendor_menu(iface):
+    print(f"\n{BOLD}{CYAN}MAC Vendor Mode:{RESET}")
+    print(f"{BOLD}1){RESET} Auto (interface + network based) [Recommended]")
+    print(f"{BOLD}2){RESET} Manual vendor selection")
+    print(f"{BOLD}3){RESET} Custom OUI")
+    print(f"{BOLD}4){RESET} Fully random")
+
+    choice = prompt("Select option [1-4]:")
+
+    if choice == "1":
+        return persistent_vendor(iface), None
+
+    if choice == "2":
+        vendors = list(VENDOR_OUIS.keys())
+        print(f"\n{BOLD}{CYAN}Available Vendors:{RESET}")
+        for i, v in enumerate(vendors, 1):
+            print(f"{BOLD}{i}){RESET} {v}")
+
+        try:
+            idx = int(prompt("Choose vendor number:")) - 1
+            return vendors[idx], None
+        except (ValueError, IndexError):
+            print("[-] Invalid selection, falling back to AUTO mode")
+            return persistent_vendor(iface), None
+
+    if choice == "3":
+        prefix = prompt("Enter OUI (e.g. 00:11:22):").strip()
+        return None, prefix
+
+    return None, None
+
+# ============================================================
 # MAC / FINGERPRINT
 # ============================================================
 
@@ -259,32 +295,39 @@ def main():
     global changer, restore_on_exit
     require_root()
     banner()
+    
+    # Basic configuration
     iface = prompt("Interface name [e.g., wlan0, eth0]:")
     if not iface_exists(iface):
-        sys.exit("[!] Interface not found")
+        sys.exit(f"{RED}[!] Interface not found{RESET}")
+    
     interval = int(prompt("Change interval in seconds [e.g., 60]:") or 60)
     count = int(prompt("How many times to change? [0 = infinite]:") or 0)
     dry = prompt("Dry-run mode? [y/n]:").lower() == "y"
     restore_on_exit = prompt("Restore original MAC on exit? [y/n]:").lower() == "y"
     logf = prompt("Log file path [optional, e.g., mac_log.txt]:") or None
     show_countdown = prompt("Show countdown timer? [y/n]:").lower() == "y"
-    vendor = persistent_vendor(iface)
+    
+    # Vendor selection
+    vendor, custom_prefix = vendor_menu(iface)
+    
     tool = detect_tool()
     changer = MACIdentityChanger(iface, tool, dry, logf)
-    changer.log(f"Vendor profile → {vendor}")
+    changer.log(f"Vendor profile → {vendor if vendor else 'Random'}")
+    
     i = 0
     try:
         while True:
             i += 1
             if count and i > count:
                 break
-            mac = random_mac(vendor)
+            mac = random_mac(vendor, custom_prefix)
             changer.log(f"[{i}] MAC → {mac}")
             changer.set_mac(mac)
             apply_fingerprint(vendor, dry)
             if show_countdown:
                 for remaining in range(interval, 0, -1):
-                    sys.stdout.write(f"\rNext change in {remaining}s...   ")
+                    sys.stdout.write(f"\r{CYAN}Next change in {remaining}s...{RESET}   ")
                     sys.stdout.flush()
                     time.sleep(1)
                 print()  # New line after countdown
@@ -292,5 +335,6 @@ def main():
                 time.sleep(interval)
     finally:
         safe_exit()
+
 if __name__ == "__main__":
     main()
